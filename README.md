@@ -9,6 +9,80 @@ Este projeto implementa o External-DNS em um cluster Amazon EKS usando Terraform
 - Cluster EKS existente
 - Provedor OIDC configurado para o cluster (para IRSA - IAM Roles for Service Accounts)
 
+## Configuração do AWS CLI
+
+Para configurar o AWS CLI corretamente para trabalhar com o EKS, siga estas etapas:
+
+1. **Instalar o AWS CLI**:
+
+   Para Linux/macOS:
+
+   ```bash
+   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+   unzip awscliv2.zip
+   sudo ./aws/install
+   ```
+
+   Para macOS:
+
+   ```bash
+   curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+   sudo installer -pkg AWSCLIV2.pkg -target /
+   ```
+
+   Para Windows:
+
+   ```
+   Baixe e execute o instalador: https://awscli.amazonaws.com/AWSCLIV2.msi
+   ```
+
+2. **Verificar a instalação**:
+
+   ```bash
+   aws --version
+   ```
+
+3. **Configurar suas credenciais da AWS**:
+
+   ```bash
+   aws configure
+   ```
+
+   Você precisará fornecer:
+
+   - Access Key ID
+   - Secret Access Key
+   - Região padrão (ex: us-east-1)
+   - Formato de saída padrão (recomendado: json)
+
+4. **Configurar múltiplos perfis (opcional)**:
+
+   Para gerenciar múltiplos ambientes ou contas AWS, edite os arquivos:
+
+   ```bash
+   ~/.aws/credentials
+   ~/.aws/config
+   ```
+
+   Exemplo de configuração de perfil:
+
+   ```
+   [profile dev]
+   region = us-east-1
+   output = json
+
+   [profile prod]
+   role_arn = arn:aws:iam::123456789012:role/AdminRole
+   source_profile = default
+   region = us-west-2
+   ```
+
+   Para usar um perfil específico:
+
+   ```bash
+   aws eks --profile dev list-clusters
+   ```
+
 ## Estrutura do Projeto
 
 ```
@@ -134,8 +208,65 @@ kubectl -n external-dns get pods
 kubectl -n external-dns logs -f $(kubectl -n external-dns get pods -o name)
 ```
 
+## Atualização do kubectl no AWS CLI
+
+Para garantir que sua instalação do kubectl esteja atualizada e compatível com seu cluster EKS, siga estas instruções:
+
+1. **Verificar a versão atual do kubectl**:
+
+   ```bash
+   kubectl version --client
+   ```
+
+2. **Instalar ou atualizar o kubectl via AWS CLI**:
+
+   Para Linux/macOS:
+
+   ```bash
+   curl -o kubectl https://s3.us-west-2.amazonaws.com/amazon-eks/1.28.3/2023-11-14/bin/linux/amd64/kubectl
+   chmod +x ./kubectl
+   mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$HOME/bin:$PATH
+   ```
+
+   Para macOS:
+
+   ```bash
+   curl -o kubectl https://s3.us-west-2.amazonaws.com/amazon-eks/1.28.3/2023-11-14/bin/darwin/amd64/kubectl
+   chmod +x ./kubectl
+   mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$HOME/bin:$PATH
+   ```
+
+   Para Windows (PowerShell):
+
+   ```powershell
+   curl -o kubectl.exe https://s3.us-west-2.amazonaws.com/amazon-eks/1.28.3/2023-11-14/bin/windows/amd64/kubectl.exe
+   ```
+
+3. **Verificar a instalação**:
+
+   ```bash
+   kubectl version --client
+   ```
+
+4. **Configurar o contexto para seu cluster EKS**:
+
+   ```bash
+   aws eks update-kubeconfig --region <região-aws> --name <nome-do-cluster>
+   ```
+
+5. **Verificar a conexão com o cluster**:
+
+   ```bash
+   kubectl get nodes
+   ```
+
+> **Importante**: Substitua a versão (1.28.3) do kubectl pela versão compatível com seu cluster. É recomendável usar a mesma versão principal do seu cluster EKS ou no máximo uma versão de diferença.
+
 ## Referências
 
 - [External-DNS - Oficial](https://github.com/kubernetes-sigs/external-dns)
 - [External-DNS - Helm Chart (Bitnami)](https://github.com/bitnami/charts/tree/main/bitnami/external-dns)
 - [IAM Roles for Service Accounts (IRSA)](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
+- [Documentação oficial da AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html)
+- [Guia de instalação da AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+- [Configuração do kubectl para EKS](https://docs.aws.amazon.com/eks/latest/userguide/create-kubeconfig.html)
