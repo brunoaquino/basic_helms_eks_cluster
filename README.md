@@ -111,6 +111,12 @@ Para configurar o AWS CLI corretamente para trabalhar com o EKS, siga estas etap
   - Configura o IAM Role for Service Account (IRSA) para acesso ao Route 53
   - Instala o External-DNS via Helm Chart
   - Configuração parametrizada (domínios, política de sincronização, etc.)
+- **Cert-Manager com Let's Encrypt**:
+  - Cria um namespace dedicado para o Cert-Manager
+  - Configura o IAM Role for Service Account (IRSA) para acesso ao Route 53
+  - Instala o Cert-Manager via Helm Chart
+  - Configura ClusterIssuer para Let's Encrypt (staging e produção)
+  - Suporte a validação DNS01 usando Route 53
 
 ## Obtenção de Dados do Cluster EKS
 
@@ -179,17 +185,21 @@ A versão recomendada para o chart é `6.13.1`.
 
 ## Variáveis Importantes
 
-| Nome                          | Descrição                 | Valor Padrão   |
-| ----------------------------- | ------------------------- | -------------- |
-| `aws_region`                  | Região da AWS             | -              |
-| `eks_cluster_name`            | Nome do cluster EKS       | -              |
-| `eks_cluster_endpoint`        | Endpoint do cluster EKS   | -              |
-| `eks_cluster_ca_cert`         | Certificado CA do cluster | -              |
-| `base_domain`                 | Domínio base              | -              |
-| `external_dns_namespace`      | Namespace do External-DNS | `external-dns` |
-| `external_dns_chart_version`  | Versão do chart Helm      | -              |
-| `external_dns_domain_filters` | Filtros de domínio        | `[]`           |
-| `external_dns_policy`         | Política de sincronização | `sync`         |
+| Nome                              | Descrição                 | Valor Padrão   |
+| --------------------------------- | ------------------------- | -------------- |
+| `aws_region`                      | Região da AWS             | -              |
+| `eks_cluster_name`                | Nome do cluster EKS       | -              |
+| `eks_cluster_endpoint`            | Endpoint do cluster EKS   | -              |
+| `eks_cluster_ca_cert`             | Certificado CA do cluster | -              |
+| `base_domain`                     | Domínio base              | -              |
+| `external_dns_namespace`          | Namespace do External-DNS | `external-dns` |
+| `external_dns_chart_version`      | Versão do chart Helm      | -              |
+| `external_dns_domain_filters`     | Filtros de domínio        | `[]`           |
+| `external_dns_policy`             | Política de sincronização | `sync`         |
+| `cert_manager_namespace`          | Namespace do Cert-Manager | `cert-manager` |
+| `cert_manager_chart_version`      | Versão do chart Helm      | `v1.13.3`      |
+| `cert_manager_letsencrypt_email`  | Email para Let's Encrypt  | -              |
+| `cert_manager_letsencrypt_server` | Servidor Let's Encrypt    | `staging`      |
 
 ## Extensão
 
@@ -207,6 +217,74 @@ Após a implantação, verifique se o External-DNS está funcionando corretament
 kubectl -n external-dns get pods
 kubectl -n external-dns logs -f $(kubectl -n external-dns get pods -o name)
 ```
+
+## Uso do Cert-Manager com Let's Encrypt
+
+O Cert-Manager instalado permite a emissão automática de certificados TLS usando Let's Encrypt. Para utilizar:
+
+1. **Verificar a instalação do Cert-Manager**:
+
+   ```bash
+   kubectl -n cert-manager get pods
+   kubectl get clusterissuers
+   ```
+
+2. **Criar certificados para seus serviços**:
+
+   Exemplo de Certificate para um serviço:
+
+   ```yaml
+   apiVersion: cert-manager.io/v1
+   kind: Certificate
+   metadata:
+     name: example-tls
+     namespace: seu-namespace
+   spec:
+     secretName: example-tls
+     issuerRef:
+       name: letsencrypt-staging
+       kind: ClusterIssuer
+     dnsNames:
+       - app.seu-dominio.com
+   ```
+
+   Para usar em produção, altere o issuerRef.name para `letsencrypt-prod`.
+
+3. **Verificar o status do certificado**:
+
+   ```bash
+   kubectl -n seu-namespace get certificates
+   kubectl -n seu-namespace get certificaterequests
+   kubectl -n seu-namespace describe certificate example-tls
+   ```
+
+4. **Exemplos de uso com Ingress**:
+
+   ```yaml
+   apiVersion: networking.k8s.io/v1
+   kind: Ingress
+   metadata:
+     name: example-ingress
+     namespace: seu-namespace
+     annotations:
+       cert-manager.io/cluster-issuer: "letsencrypt-staging"
+   spec:
+     tls:
+       - hosts:
+           - app.seu-dominio.com
+         secretName: example-tls
+     rules:
+       - host: app.seu-dominio.com
+         http:
+           paths:
+             - path: /
+               pathType: Prefix
+               backend:
+                 service:
+                   name: example-service
+                   port:
+                     number: 80
+   ```
 
 ## Atualização do kubectl no AWS CLI
 
@@ -270,3 +348,6 @@ Para garantir que sua instalação do kubectl esteja atualizada e compatível co
 - [Documentação oficial da AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html)
 - [Guia de instalação da AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - [Configuração do kubectl para EKS](https://docs.aws.amazon.com/eks/latest/userguide/create-kubeconfig.html)
+- [Cert-Manager - Oficial](https://cert-manager.io/docs/)
+- [Cert-Manager - Helm Chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
+- [Let's Encrypt - DNS Challenge](https://cert-manager.io/docs/configuration/acme/dns01/)

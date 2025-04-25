@@ -51,3 +51,32 @@ module "external_dns" {
     ManagedBy   = "terraform"
   }
 }
+
+# Módulo Cert-Manager
+module "cert_manager" {
+  source = "./modules/cert-manager"
+
+  aws_region           = var.aws_region
+  eks_cluster_name     = var.eks_cluster_name
+  eks_cluster_endpoint = var.eks_cluster_endpoint
+  eks_cluster_ca_cert  = var.eks_cluster_ca_cert
+
+  base_domain       = var.base_domain
+  letsencrypt_email = var.cert_manager_letsencrypt_email
+
+  # Configurações opcionais
+  namespace            = var.cert_manager_namespace
+  chart_version        = var.cert_manager_chart_version
+  enabled              = var.cert_manager_enabled
+  create_namespace     = var.cert_manager_create_namespace
+  create_clusterissuer = var.cert_manager_create_clusterissuer
+  letsencrypt_server   = var.cert_manager_letsencrypt_server
+
+  tags = {
+    Environment = "production"
+    ManagedBy   = "terraform"
+  }
+
+  # Adiciona dependência explícita do external_dns
+  depends_on = [module.external_dns]
+}

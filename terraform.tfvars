@@ -7,12 +7,12 @@ eks_cluster_ca_cert  = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3
 base_domain = "mixnarede.com.br"
 
 # Cert Manager
-# cert_manager_namespace     = "cert-manager"
-# cert_manager_chart_version = "v1.13.3"
-# letsencrypt_email          = "bruno-smv2@hotmail.com"
-# letsencrypt_server         = "https://acme-v02.api.letsencrypt.org/directory" # Production
-# # letsencrypt_server  = "https://acme-staging-v02.api.letsencrypt.org/directory" # Staging (para testes)
-# cluster_issuer_name = "letsencrypt-prod"
+cert_manager_enabled              = true
+cert_manager_namespace            = "cert-manager"
+cert_manager_chart_version        = "v1.13.3"
+cert_manager_letsencrypt_email    = "bruno-smv2@hotmail.com"
+cert_manager_letsencrypt_server   = "staging" # Altere para "prod" em produção
+cert_manager_create_clusterissuer = true
 
 # External DNS
 external_dns_namespace     = "external-dns"
