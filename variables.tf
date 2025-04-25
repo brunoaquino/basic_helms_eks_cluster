@@ -122,3 +122,46 @@ variable "cert_manager_letsencrypt_server" {
     error_message = "O valor de cert_manager_letsencrypt_server deve ser 'staging' ou 'prod'."
   }
 }
+
+# Variáveis para o módulo Metrics Server
+variable "metrics_server_enabled" {
+  description = "Habilita ou desabilita a instalação do Metrics Server"
+  type        = bool
+  default     = true
+}
+
+variable "metrics_server_namespace" {
+  description = "Namespace onde o Metrics Server será instalado"
+  type        = string
+  default     = "kube-system"
+}
+
+variable "metrics_server_chart_version" {
+  description = "Versão do chart Helm do Metrics Server"
+  type        = string
+  default     = "3.10.0"
+}
+
+variable "metrics_server_cpu_request" {
+  description = "Requisição de CPU para o Metrics Server"
+  type        = string
+  default     = "100m"
+}
+
+variable "metrics_server_memory_request" {
+  description = "Requisição de memória para o Metrics Server"
+  type        = string
+  default     = "128Mi"
+}
+
+variable "metrics_server_cpu_limit" {
+  description = "Limite de CPU para o Metrics Server"
+  type        = string
+  default     = "300m"
+}
+
+variable "metrics_server_memory_limit" {
+  description = "Limite de memória para o Metrics Server"
+  type        = string
+  default     = "512Mi"
+}

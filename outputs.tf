@@ -38,3 +38,19 @@ output "cert_manager_letsencrypt_issuers" {
   description = "ClusterIssuers do Let's Encrypt configurados"
   value       = module.cert_manager.letsencrypt_issuers
 }
+
+# Métricas Server outputs
+output "metrics_server_enabled" {
+  description = "Indica se o Metrics Server está habilitado"
+  value       = module.metrics_server.metrics_server_enabled
+}
+
+output "metrics_server_namespace" {
+  description = "Namespace onde o Metrics Server está instalado"
+  value       = module.metrics_server.metrics_server_namespace
+}
+
+output "metrics_server_version" {
+  description = "Versão do chart do Metrics Server instalada"
+  value       = module.metrics_server.metrics_server_version
+}

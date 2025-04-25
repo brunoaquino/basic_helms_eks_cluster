@@ -80,3 +80,37 @@ module "cert_manager" {
   # Adiciona dependência explícita do external_dns
   depends_on = [module.external_dns]
 }
+
+# Módulo Metrics Server (substituindo o Prometheus)
+module "metrics_server" {
+  source = "./modules/metrics-server"
+
+  aws_region           = var.aws_region
+  eks_cluster_name     = var.eks_cluster_name
+  eks_cluster_endpoint = var.eks_cluster_endpoint
+  eks_cluster_ca_cert  = var.eks_cluster_ca_cert
+
+  # Configurações principais
+  enabled   = var.metrics_server_enabled
+  namespace = var.metrics_server_namespace
+
+  # Versão do chart
+  chart_version = var.metrics_server_chart_version
+
+  # Configurações de recursos
+  resources = {
+    requests = {
+      cpu    = var.metrics_server_cpu_request
+      memory = var.metrics_server_memory_request
+    }
+    limits = {
+      cpu    = var.metrics_server_cpu_limit
+      memory = var.metrics_server_memory_limit
+    }
+  }
+
+  tags = {
+    Environment = "production"
+    ManagedBy   = "terraform"
+  }
+}

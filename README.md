@@ -117,6 +117,7 @@ Para configurar o AWS CLI corretamente para trabalhar com o EKS, siga estas etap
   - Instala o Cert-Manager via Helm Chart
   - Configura ClusterIssuer para Let's Encrypt (staging e produção)
   - Suporte a validação DNS01 usando Route 53
+- **Metrics Server**: Coleta de métricas do cluster para suporte a `kubectl top` e Horizontal Pod Autoscaler (HPA)
 
 ## Obtenção de Dados do Cluster EKS
 
@@ -351,3 +352,14 @@ Para garantir que sua instalação do kubectl esteja atualizada e compatível co
 - [Cert-Manager - Oficial](https://cert-manager.io/docs/)
 - [Cert-Manager - Helm Chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
 - [Let's Encrypt - DNS Challenge](https://cert-manager.io/docs/configuration/acme/dns01/)
+
+# Stack de Monitoramento com Metrics Server
+
+Este módulo instala o Metrics Server para coleta básica de métricas do cluster, permitindo o uso de comandos como `kubectl top nodes` e `kubectl top pods`, além de fornecer os dados necessários para o Horizontal Pod Autoscaler (HPA).
+
+### Principais recursos
+
+- Coleta de métricas básicas de CPU e memória de nós e pods
+- Suporte ao escalonamento automático horizontal (HPA)
+- Configuração otimizada para clusters EKS
+- Baixo consumo de recursos

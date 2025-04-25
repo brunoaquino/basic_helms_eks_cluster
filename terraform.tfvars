@@ -26,15 +26,11 @@ external_dns_policy        = "sync"
 external_dns_txt_owner_id  = "app-cluster"
 external_dns_txt_prefix    = "external-dns-"
 
-# # Istio
-# istio_namespace             = "istio-system"
-# istio_chart_version_base    = "1.20.2"
-# istio_chart_version_istiod  = "1.20.2"
-# istio_chart_version_gateway = "1.20.2"
-
-# # Loki e Grafana
-# loki_grafana_namespace = "monitoring"
-# loki_chart_version     = "2.9.9"
-# grafana_chart_version  = "6.60.4"
-# grafana_admin_password = "admin" # Altere para uma senha forte
-# # grafana_domain será gerado automaticamente como "grafana.example.com" 
+# Metrics Server
+metrics_server_enabled        = true
+metrics_server_namespace      = "kube-system"
+metrics_server_chart_version  = "3.10.0"
+metrics_server_cpu_request    = "100m"
+metrics_server_memory_request = "128Mi"
+metrics_server_cpu_limit      = "300m"
+metrics_server_memory_limit   = "512Mi"
