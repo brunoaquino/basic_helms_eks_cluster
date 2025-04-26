@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    # URL real do servidor de produção do Let's Encrypt
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: bruno.aquino@gx2.com.br  # Substitua pelo email usado na configuração do terraform
+    privateKeySecretRef:
+      name: letsencrypt-prod-account-key
+    solvers:
+    - dns01:
+        route53:
+          region: us-east-1  # Substitua pela sua região da AWS
+        selector:
+          dnsZones:
+          - mixnarede.com.br 

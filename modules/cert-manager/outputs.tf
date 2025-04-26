@@ -15,7 +15,7 @@ output "iam_role_arn" {
 
 output "letsencrypt_issuers" {
   description = "Lista de ClusterIssuers criados"
-  value       = var.enabled && var.create_clusterissuer ? [local.letsencrypt_issuer_name] : []
+  value       = var.enabled && var.create_clusterissuer ? ["letsencrypt-staging", "letsencrypt-prod"] : []
 }
 
 output "version" {

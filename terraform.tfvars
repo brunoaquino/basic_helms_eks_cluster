@@ -11,7 +11,7 @@ cert_manager_enabled              = true
 cert_manager_namespace            = "cert-manager"
 cert_manager_chart_version        = "v1.13.3"
 cert_manager_letsencrypt_email    = "bruno-smv2@hotmail.com"
-cert_manager_letsencrypt_server   = "staging" # Altere para "prod" em produção
+cert_manager_letsencrypt_server   = "prod" # Altere para "prod" em produção
 cert_manager_create_clusterissuer = true
 
 # External DNS

@@ -133,8 +133,8 @@ resource "null_resource" "wait_for_cert_manager" {
   ]
 }
 
-# Criação do ClusterIssuer para Let's Encrypt usando kubectl
-resource "null_resource" "letsencrypt_issuer" {
+# Criação do ClusterIssuer para Let's Encrypt Staging
+resource "null_resource" "letsencrypt_staging_issuer" {
   count = var.enabled && var.create_clusterissuer ? 1 : 0
 
   provisioner "local-exec" {
@@ -143,13 +143,13 @@ resource "null_resource" "letsencrypt_issuer" {
       apiVersion: cert-manager.io/v1
       kind: ClusterIssuer
       metadata:
-        name: ${local.letsencrypt_issuer_name}
+        name: letsencrypt-staging
       spec:
         acme:
           email: ${var.letsencrypt_email}
-          server: ${local.letsencrypt_servers[var.letsencrypt_server]}
+          server: ${local.letsencrypt_servers["staging"]}
           privateKeySecretRef:
-            name: ${local.letsencrypt_issuer_name}-account-key
+            name: letsencrypt-staging-account-key
           solvers:
           - dns01:
               route53:
@@ -163,5 +163,38 @@ resource "null_resource" "letsencrypt_issuer" {
 
   depends_on = [
     null_resource.wait_for_cert_manager
+  ]
+}
+
+# Criação do ClusterIssuer para Let's Encrypt Production
+resource "null_resource" "letsencrypt_prod_issuer" {
+  count = var.enabled && var.create_clusterissuer ? 1 : 0
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      cat <<EOF | kubectl apply -f -
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: letsencrypt-prod
+      spec:
+        acme:
+          email: ${var.letsencrypt_email}
+          server: ${local.letsencrypt_servers["prod"]}
+          privateKeySecretRef:
+            name: letsencrypt-prod-account-key
+          solvers:
+          - dns01:
+              route53:
+                region: ${var.aws_region}
+            selector:
+              dnsZones:
+              - ${var.base_domain}
+      EOF
+    EOT
+  }
+
+  depends_on = [
+    null_resource.letsencrypt_staging_issuer
   ]
 }

@@ -165,3 +165,76 @@ variable "metrics_server_memory_limit" {
   type        = string
   default     = "512Mi"
 }
+
+# Variáveis para o módulo Nginx Ingress Controller
+variable "nginx_ingress_enabled" {
+  description = "Habilita ou desabilita a instalação do Nginx Ingress Controller"
+  type        = bool
+  default     = true
+}
+
+variable "nginx_ingress_namespace" {
+  description = "Namespace onde o Nginx Ingress Controller será instalado"
+  type        = string
+  default     = "ingress-nginx"
+}
+
+variable "nginx_ingress_create_namespace" {
+  description = "Se deve criar o namespace para o Nginx Ingress Controller"
+  type        = bool
+  default     = true
+}
+
+variable "nginx_ingress_chart_version" {
+  description = "Versão do chart Helm do Nginx Ingress Controller"
+  type        = string
+  default     = "4.7.1"
+}
+
+variable "nginx_ingress_service_type" {
+  description = "Tipo de serviço para o Nginx Ingress Controller (LoadBalancer ou NodePort)"
+  type        = string
+  default     = "LoadBalancer"
+}
+
+variable "nginx_ingress_load_balancer_type" {
+  description = "Tipo de balanceador de carga AWS a ser utilizado (classic, nlb ou nlb-ip)"
+  type        = string
+  default     = "nlb"
+}
+
+variable "nginx_ingress_create_irsa" {
+  description = "Se deve criar um perfil IAM para usar com Service Account (IRSA)"
+  type        = bool
+  default     = true
+}
+
+variable "nginx_ingress_is_default_class" {
+  description = "Se o Nginx Ingress Controller deve ser a classe de ingress padrão"
+  type        = bool
+  default     = true
+}
+
+variable "nginx_ingress_cpu_request" {
+  description = "Requisição de CPU para o Nginx Ingress Controller"
+  type        = string
+  default     = "100m"
+}
+
+variable "nginx_ingress_memory_request" {
+  description = "Requisição de memória para o Nginx Ingress Controller"
+  type        = string
+  default     = "128Mi"
+}
+
+variable "nginx_ingress_cpu_limit" {
+  description = "Limite de CPU para o Nginx Ingress Controller"
+  type        = string
+  default     = "300m"
+}
+
+variable "nginx_ingress_memory_limit" {
+  description = "Limite de memória para o Nginx Ingress Controller"
+  type        = string
+  default     = "256Mi"
+}

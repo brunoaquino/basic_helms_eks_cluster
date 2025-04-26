@@ -81,6 +81,46 @@ module "cert_manager" {
   depends_on = [module.external_dns]
 }
 
+# Módulo Nginx Ingress Controller
+module "nginx_ingress" {
+  source = "./modules/nginx-ingress"
+
+  aws_region           = var.aws_region
+  eks_cluster_name     = var.eks_cluster_name
+  eks_cluster_endpoint = var.eks_cluster_endpoint
+  eks_cluster_ca_cert  = var.eks_cluster_ca_cert
+
+  # Configurações principais
+  enabled                  = var.nginx_ingress_enabled
+  namespace                = var.nginx_ingress_namespace
+  create_namespace         = var.nginx_ingress_create_namespace
+  chart_version            = var.nginx_ingress_chart_version
+  service_type             = var.nginx_ingress_service_type
+  load_balancer_type       = var.nginx_ingress_load_balancer_type
+  create_irsa              = var.nginx_ingress_create_irsa
+  is_default_ingress_class = var.nginx_ingress_is_default_class
+
+  # Configurações de recursos
+  resources = {
+    requests = {
+      cpu    = var.nginx_ingress_cpu_request
+      memory = var.nginx_ingress_memory_request
+    }
+    limits = {
+      cpu    = var.nginx_ingress_cpu_limit
+      memory = var.nginx_ingress_memory_limit
+    }
+  }
+
+  tags = {
+    Environment = "production"
+    ManagedBy   = "terraform"
+  }
+
+  # Adiciona dependência dos outros módulos
+  depends_on = [module.cert_manager]
+}
+
 # Módulo Metrics Server (substituindo o Prometheus)
 module "metrics_server" {
   source = "./modules/metrics-server"
