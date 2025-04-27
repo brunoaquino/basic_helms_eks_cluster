@@ -151,12 +151,9 @@ resource "null_resource" "letsencrypt_staging_issuer" {
           privateKeySecretRef:
             name: letsencrypt-staging-account-key
           solvers:
-          - dns01:
-              route53:
-                region: ${var.aws_region}
-            selector:
-              dnsZones:
-              - ${var.base_domain}
+          - http01:
+              ingress:
+                class: nginx
       EOF
     EOT
   }
@@ -184,12 +181,9 @@ resource "null_resource" "letsencrypt_prod_issuer" {
           privateKeySecretRef:
             name: letsencrypt-prod-account-key
           solvers:
-          - dns01:
-              route53:
-                region: ${var.aws_region}
-            selector:
-              dnsZones:
-              - ${var.base_domain}
+          - http01:
+              ingress:
+                class: nginx
       EOF
     EOT
   }
