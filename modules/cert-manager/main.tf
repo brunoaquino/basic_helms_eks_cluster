@@ -112,83 +112,68 @@ resource "helm_release" "cert_manager" {
   ]
 }
 
-# Aguarda que o Cert-Manager esteja pronto antes de criar o ClusterIssuer
-resource "null_resource" "wait_for_cert_manager" {
-  count = var.enabled && var.create_clusterissuer ? 1 : 0
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      kubectl wait --for=condition=available --timeout=300s deployment/cert-manager -n ${var.namespace}
-      kubectl wait --for=condition=available --timeout=300s deployment/cert-manager-webhook -n ${var.namespace}
-      # Aguarda mais tempo para que os CRDs sejam registrados
-      echo "Aguardando 60 segundos para que os CRDs do cert-manager sejam registrados..."
-      sleep 60
-      # Verifica se o CRD ClusterIssuer existe
-      kubectl get crd clusterissuers.cert-manager.io
-    EOT
-  }
-
-  depends_on = [
-    helm_release.cert_manager
-  ]
-}
-
 # Criação do ClusterIssuer para Let's Encrypt Staging
-resource "null_resource" "letsencrypt_staging_issuer" {
+resource "kubernetes_manifest" "letsencrypt_staging_issuer" {
   count = var.enabled && var.create_clusterissuer ? 1 : 0
 
-  provisioner "local-exec" {
-    command = <<-EOT
-      cat <<EOF | kubectl apply -f -
-      apiVersion: cert-manager.io/v1
-      kind: ClusterIssuer
-      metadata:
-        name: letsencrypt-staging
-      spec:
-        acme:
-          email: ${var.letsencrypt_email}
-          server: ${local.letsencrypt_servers["staging"]}
-          privateKeySecretRef:
-            name: letsencrypt-staging-account-key
-          solvers:
-          - http01:
-              ingress:
-                class: nginx
-      EOF
-    EOT
+  manifest = {
+    apiVersion = "cert-manager.io/v1"
+    kind       = "ClusterIssuer"
+    metadata = {
+      name = "letsencrypt-staging"
+    }
+    spec = {
+      acme = {
+        email  = var.letsencrypt_email
+        server = local.letsencrypt_servers["staging"]
+        privateKeySecretRef = {
+          name = "letsencrypt-staging-account-key"
+        }
+        solvers = [
+          {
+            http01 = {
+              ingress = {
+                class = "nginx"
+              }
+            }
+          }
+        ]
+      }
+    }
   }
 
-  depends_on = [
-    null_resource.wait_for_cert_manager
-  ]
+  depends_on = [helm_release.cert_manager]
 }
 
 # Criação do ClusterIssuer para Let's Encrypt Production
-resource "null_resource" "letsencrypt_prod_issuer" {
+resource "kubernetes_manifest" "letsencrypt_prod_issuer" {
   count = var.enabled && var.create_clusterissuer ? 1 : 0
 
-  provisioner "local-exec" {
-    command = <<-EOT
-      cat <<EOF | kubectl apply -f -
-      apiVersion: cert-manager.io/v1
-      kind: ClusterIssuer
-      metadata:
-        name: letsencrypt-prod
-      spec:
-        acme:
-          email: ${var.letsencrypt_email}
-          server: ${local.letsencrypt_servers["prod"]}
-          privateKeySecretRef:
-            name: letsencrypt-prod-account-key
-          solvers:
-          - http01:
-              ingress:
-                class: nginx
-      EOF
-    EOT
+  manifest = {
+    apiVersion = "cert-manager.io/v1"
+    kind       = "ClusterIssuer"
+    metadata = {
+      name = "letsencrypt-prod"
+    }
+    spec = {
+      acme = {
+        email  = var.letsencrypt_email
+        server = local.letsencrypt_servers["prod"]
+        privateKeySecretRef = {
+          name = "letsencrypt-prod-account-key"
+        }
+        solvers = [
+          {
+            http01 = {
+              ingress = {
+                class = "nginx"
+              }
+            }
+          }
+        ]
+      }
+    }
   }
 
-  depends_on = [
-    null_resource.letsencrypt_staging_issuer
-  ]
+  depends_on = [kubernetes_manifest.letsencrypt_staging_issuer]
 }

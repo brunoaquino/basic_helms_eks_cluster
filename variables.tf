@@ -1,6 +1,7 @@
 variable "aws_region" {
-  description = "Região da AWS onde os recursos serão criados"
+  description = "AWS region"
   type        = string
+  default     = "us-east-1"
 }
 
 variable "eks_cluster_name" {
@@ -16,6 +17,12 @@ variable "eks_cluster_endpoint" {
 variable "eks_cluster_ca_cert" {
   description = "Certificado CA do cluster EKS"
   type        = string
+}
+
+variable "environment" {
+  description = "Ambiente (dev, staging, prod)"
+  type        = string
+  default     = "dev"
 }
 
 variable "base_domain" {
