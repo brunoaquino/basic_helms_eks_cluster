@@ -76,8 +76,32 @@ variable "txt_prefix" {
   default     = "external-dns-"
 }
 
+variable "resources" {
+  description = "Recursos para o External DNS"
+  type = object({
+    requests = object({
+      cpu    = string
+      memory = string
+    })
+    limits = object({
+      cpu    = string
+      memory = string
+    })
+  })
+  default = {
+    requests = {
+      cpu    = "50m"
+      memory = "128Mi"
+    }
+    limits = {
+      cpu    = "100m"
+      memory = "256Mi"
+    }
+  }
+}
+
 variable "tags" {
   description = "Tags a serem aplicadas aos recursos"
   type        = map(string)
   default     = {}
-} 
+}

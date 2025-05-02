@@ -46,6 +46,18 @@ module "external_dns" {
   txt_prefix       = var.external_dns_txt_prefix
   aws_prefer_cname = var.external_dns_aws_prefer_cname
 
+  # Configurações de recursos
+  resources = {
+    requests = {
+      cpu    = var.external_dns_cpu_request
+      memory = var.external_dns_memory_request
+    }
+    limits = {
+      cpu    = var.external_dns_cpu_limit
+      memory = var.external_dns_memory_limit
+    }
+  }
+
   tags = {
     Environment = "production"
     ManagedBy   = "terraform"
@@ -71,6 +83,18 @@ module "cert_manager" {
   create_namespace     = var.cert_manager_create_namespace
   create_clusterissuer = var.cert_manager_create_clusterissuer
   letsencrypt_server   = var.cert_manager_letsencrypt_server
+
+  # Configurações de recursos
+  resources = {
+    requests = {
+      cpu    = var.cert_manager_cpu_request
+      memory = var.cert_manager_memory_request
+    }
+    limits = {
+      cpu    = var.cert_manager_cpu_limit
+      memory = var.cert_manager_memory_limit
+    }
+  }
 
   tags = {
     Environment = "production"

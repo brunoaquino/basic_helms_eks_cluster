@@ -106,6 +106,27 @@ resource "helm_release" "cert_manager" {
     value = "true"
   }
 
+  # Configurações de recursos
+  set {
+    name  = "resources.requests.cpu"
+    value = var.resources.requests.cpu
+  }
+
+  set {
+    name  = "resources.requests.memory"
+    value = var.resources.requests.memory
+  }
+
+  set {
+    name  = "resources.limits.cpu"
+    value = var.resources.limits.cpu
+  }
+
+  set {
+    name  = "resources.limits.memory"
+    value = var.resources.limits.memory
+  }
+
   depends_on = [
     kubernetes_namespace.cert_manager,
     module.irsa

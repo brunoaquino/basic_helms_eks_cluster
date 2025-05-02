@@ -68,8 +68,32 @@ variable "letsencrypt_server" {
   }
 }
 
+variable "resources" {
+  description = "Recursos para o Cert Manager"
+  type = object({
+    requests = object({
+      cpu    = string
+      memory = string
+    })
+    limits = object({
+      cpu    = string
+      memory = string
+    })
+  })
+  default = {
+    requests = {
+      cpu    = "100m"
+      memory = "128Mi"
+    }
+    limits = {
+      cpu    = "200m"
+      memory = "256Mi"
+    }
+  }
+}
+
 variable "tags" {
   description = "Tags a serem aplicadas aos recursos"
   type        = map(string)
   default     = {}
-} 
+}

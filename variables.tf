@@ -130,6 +130,30 @@ variable "cert_manager_letsencrypt_server" {
   }
 }
 
+variable "cert_manager_cpu_request" {
+  description = "Requisição de CPU para o Cert Manager"
+  type        = string
+  default     = "100m"
+}
+
+variable "cert_manager_memory_request" {
+  description = "Requisição de memória para o Cert Manager"
+  type        = string
+  default     = "128Mi"
+}
+
+variable "cert_manager_cpu_limit" {
+  description = "Limite de CPU para o Cert Manager"
+  type        = string
+  default     = "200m"
+}
+
+variable "cert_manager_memory_limit" {
+  description = "Limite de memória para o Cert Manager"
+  type        = string
+  default     = "256Mi"
+}
+
 # Variáveis para o módulo Metrics Server
 variable "metrics_server_enabled" {
   description = "Habilita ou desabilita a instalação do Metrics Server"
@@ -242,6 +266,30 @@ variable "nginx_ingress_cpu_limit" {
 
 variable "nginx_ingress_memory_limit" {
   description = "Limite de memória para o Nginx Ingress Controller"
+  type        = string
+  default     = "256Mi"
+}
+
+variable "external_dns_cpu_request" {
+  description = "Requisição de CPU para o External DNS"
+  type        = string
+  default     = "50m"
+}
+
+variable "external_dns_memory_request" {
+  description = "Requisição de memória para o External DNS"
+  type        = string
+  default     = "128Mi"
+}
+
+variable "external_dns_cpu_limit" {
+  description = "Limite de CPU para o External DNS"
+  type        = string
+  default     = "100m"
+}
+
+variable "external_dns_memory_limit" {
+  description = "Limite de memória para o External DNS"
   type        = string
   default     = "256Mi"
 }
